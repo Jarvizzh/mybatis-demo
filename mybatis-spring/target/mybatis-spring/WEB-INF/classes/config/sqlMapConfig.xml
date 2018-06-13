@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <!--setting要放在最前面，因为会影响整个配置-->
+    <settings>
+        <!--开启延迟加载,默认false-->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <!--设置不积极加载,默认true-->
+        <setting name="aggressiveLazyLoading" value="false"/>
+
+        <!-- 全局映射器启用二级缓存 *主要将此属性设置完成即可-->
+        <setting name="cacheEnabled" value="true"/>
+
+        <!-- 对于未知的SQL查询，允许返回不同的结果集以达到通用的效果 -->
+        <setting name="multipleResultSetsEnabled" value="true"/>
+
+    </settings>
+
+    <typeAliases>
+        <typeAlias type="com.mybatis.model.User" alias="User"/>
+    </typeAliases>
+
+
+</configuration>
+

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:task="http://www.springframework.org/schema/task" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-2.5.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+       http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--beans scanning package -->
+    <context:component-scan base-package="com.mybatis">
+        <context:exclude-filter type="annotation"
+            expression="org.springframework.stereotype.Controller" />
+    </context:component-scan>
+
+    <task:annotation-driven />
+
+    <!--property placeholder resolver -->
+    <bean id="propertyConfigurer"
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:properties/jdbc.properties</value>
+                <value>classpath:properties/log4j.properties</value>
+                <value>classpath:properties/redis.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--datasource 配置数据源 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="jdbcUrl" value="${jdbc.url}" />
+        <property name="driverClass" value="${jdbc.driver}" />
+        <property name="user" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+    </bean>
+
+    <!--配置mybatis SqlSessionFactory-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!--mybatis配置文件的位置-->
+        <property name="configLocation" value="classpath:config/sqlMapConfig.xml" />
+        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+    </bean>
+
+    <!-- mapper 批量扫描，从mapper包中扫描出mapper接口，自动创建代理对象并在spring容器中注册-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--指定扫描的包-->
+        <property name="basePackage" value="com.mybatis.mapper"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+
+    <!-- 配置事务 -->
+    <bean id="txManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <tx:annotation-driven transaction-manager="txManager" />
+
+    <aop:aspectj-autoproxy/>
+
+    <!--整合redis开始-->
+    <!--RedisPoolConfig-->
+    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxIdle" value="${redis.maxIdle}" />
+        <property name="maxTotal" value="${redis.maxActive}" />
+        <property name="maxWaitMillis" value="${redis.maxWait}" />
+        <property name="testOnBorrow" value="${redis.testOnBorrow}" />
+    </bean>
+
+    <!--配置RedisPool来获取jedis实例-->
+    <bean id="jedisPool" class="redis.clients.jedis.JedisPool">
+        <constructor-arg name="poolConfig" ref="jedisPoolConfig" />
+        <constructor-arg name="host" value="${redis.host}" />
+        <constructor-arg name="port" value="${redis.port}" type="int" />
+    </bean>
+
+    <!--<bean id="sentinelConfig"-->
+          <!--class="org.springframework.data.redis.connection.RedisSentinelConfiguration">-->
+        <!--<property name="master">-->
+            <!--<bean class="org.springframework.data.redis.connection.RedisNode">-->
+                <!--<property name="name" value="mymaster"></property>-->
+            <!--</bean>-->
+        <!--</property>-->
+        <!--<property name="sentinels">-->
+            <!--<set>-->
+                <!--<bean class="org.springframework.data.redis.connection.RedisNode">-->
+                    <!--<constructor-arg name="host" value="${redis.host}" />-->
+                    <!--<constructor-arg name="port" value="${redis.port}" />-->
+                <!--</bean>-->
+            <!--</set>-->
+        <!--</property>-->
+    <!--</bean>-->
+     <!--在此将sentinel配置集成到redis连接池中 -->
+    <bean id="redisConnectionFactory"
+          class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <property name="timeout" value="20000"/>
+        <property name="poolConfig" ref="jedisPoolConfig"/>
+        <property name="hostName" value="${redis.host}"/>
+        <property name="port" value="${redis.port}"/>
+        <!--<constructor-arg name="sentinelConfig" ref="sentinelConfig"></constructor-arg>-->
+    </bean>
+
+    <bean id="stringRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
+        <constructor-arg name="connectionFactory" ref="redisConnectionFactory" />
+    </bean>
+    <!--整合redis结束-->
+
+
+
+    <!--spring整合Quartz定时调度任务插件开始-->
+    <!--
+    1.配置作业 JobDetail
+    -->
+        <!--&lt;!&ndash;第一种方法：使用MethodInvokingJobDetailFactoryBean， 可配置自己定义的POJO &ndash;&gt;-->
+    <!--<bean id="simpleJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">-->
+        <!--<property name="targetObject" ref="myQuartzBean" />-->
+        <!--<property name="targetMethod" value="printMessage" />&lt;!&ndash;要调度的方法&ndash;&gt;-->
+    <!--</bean>-->
+
+        <!--&lt;!&ndash;第二种方法：使用JobDetailFactoryBean，如果你需要更高级的设置，需要给作业传递数据，想更加灵活的话就使用这种方式。&ndash;&gt;-->
+    <!--<bean name="firstComplexJobDetail"    class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
+        <!--<property name="jobClass" value="com.mybatis.quartz.spr.MyJobClassBean" />-->
+        <!--<property name="jobDataMap">-->
+            <!--&lt;!&ndash;suppress InjectionValueTypeInspection &ndash;&gt;-->
+            <!--<map>-->
+                <!--<entry key="anotherBean" value-ref="anotherBean" />-->
+                <!--<entry key="intValue" value="123" />-->
+            <!--</map>-->
+        <!--</property>-->
+        <!--<property name="durability" value="true" />-->
+    <!--</bean>-->
+
+    <!--&lt;!&ndash;-->
+    <!--2.配置触发器Trigger-->
+    <!--&ndash;&gt;-->
+        <!--&lt;!&ndash;简单触发器&ndash;&gt;-->
+    <!--<bean id="simpleTrigger"  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">-->
+        <!--<property name="jobDetail" ref="simpleJobDetail" />-->
+        <!--<property name="startDelay" value="1000" />-->
+        <!--<property name="repeatInterval" value="3000" /> &lt;!&ndash;重复执行频率，每隔3s&ndash;&gt;-->
+        <!--<property name="repeatCount" value="3" />  &lt;!&ndash;重复次数&ndash;&gt;-->
+        <!--&lt;!&ndash;<property name="startTime" value=""/>&ndash;&gt;-->
+    <!--</bean>-->
+        <!--&lt;!&ndash;计划触发器&ndash;&gt;-->
+    <!--<bean id="cronTrigger"  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
+        <!--<property name="jobDetail" ref="firstComplexJobDetail" />-->
+        <!--<property name="cronExpression" value="0/5 * * ? * *" />-->
+    <!--</bean>-->
+
+    <!--&lt;!&ndash;-->
+    <!--3.配置调度器Scheduler-->
+    <!--&ndash;&gt;-->
+    <!--<bean  class="org.springframework.scheduling.quartz.SchedulerFactoryBean">-->
+        <!--&lt;!&ndash;绑定JobDetail&ndash;&gt;-->
+        <!--<property name="jobDetails">-->
+            <!--<list>-->
+                <!--<ref bean="simpleJobDetail" />-->
+                <!--<ref bean="firstComplexJobDetail" />-->
+            <!--</list>-->
+        <!--</property>-->
+
+        <!--&lt;!&ndash;绑定Trigger&ndash;&gt;-->
+        <!--<property name="triggers">-->
+            <!--<list>-->
+                <!--<ref bean="simpleTrigger" />-->
+                <!--<ref bean="cronTrigger" />-->
+            <!--</list>-->
+        <!--</property>-->
+    <!--</bean>-->
+
+    <!--Quartz结束-->
+
+
+</beans>
