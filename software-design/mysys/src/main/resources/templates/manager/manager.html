@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+    <link rel="stylesheet" href="static/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="static/dist/css/style.css"/>
+    <script src="static/dist/jquery/jquery.min.js"></script>
+    <script src="static/dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div>
+    <strong
+            class="page-header"><font size="7pt" color="grey">人员信息管理系统</font><font size="5pt" color="grey">
+        <small>—张金鸿</small>
+    </font></strong>
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div>
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" onclick="window.location.href = 'manager/addUser'">
+                            添加人员
+                            <b class="caret"></b>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" onclick="window.location.href = 'manager/findUser'">
+                            搜索人员
+                            <b class="caret"></b>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" onclick="window.location.href = 'manager/frozenUser'">
+                            审核注册用户
+                            <b class="caret"></b>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </nav>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+    <link rel="stylesheet" href="../static/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="../static/dist/css/style.css"/>
+    <script src="../static/dist/jquery/jquery.min.js"></script>
+    <script src="../static/dist/js/bootstrap.min.js"></script>
+    <script src="../static/js/findByManager.js"></script>
+</head>
+<body>
+<div style="padding: 10px 100px 10px;">
+    <form class="bs-example bs-example-form form" role="form">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="input-group">
+                    <input type="text" class="form-control name-text"/>
+                    <span class="input-group-btn">
+                        <button class="btn btn-default name" type="button">查询姓名</button>
+                    </span>
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-6 -->
+            <div class="col-lg-4">
+                <div class="input-group">
+                    <input type="text" class="form-control phone-text"/>
+                    <span class="input-group-btn">
+                        <button class="btn btn-default phone" type="button">查询号码</button>
+                    </span>
+                </div><!-- /input-group -->
+            </div>
+            <div class="col-lg-4">
+                <div class="input-group">
+                    <input type="text" class="form-control  hobby-text"/>
+                    <span class="input-group-btn">
+                        <button class="btn btn-default hobby" type="button">查询兴趣爱好</button>
+                    </span>
+                </div><!-- /input-group -->
+            </div>
+        </div><!-- /.row -->
+    </form>
+
+    <div class="col-lg-12 col-md-12 col-sm-12"><table class="table table-striped">
+        <caption class="text-primary">查询结果</caption>
+        <thead>
+        <tr>
+            <th>昵称</th>
+            <th>性别</th>
+            <th>qq</th>
+            <th>号码</th>
+            <th>微信</th>
+            <th>邮箱</th>
+            <th>地址</th>
+            <th>介绍</th>
+            <th>兴趣爱好</th>
+        </tr>
+        </thead>
+        <tbody class="t-body">
+
+        </tbody>
+    </table></div>
+</div>
+</body>
+</html>
